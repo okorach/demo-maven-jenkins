@@ -4,7 +4,7 @@ pipeline {
     stage('git') {
       steps {
         script {
-          sh 'git branch -r | grep -v "\->" | while read remote; do git branch --track "${remote#origin/}" "$remote"; done'
+          sh 'git branch -r | grep -v -E ".>" | while read remote; do git branch --track "${remote#origin/}" "$remote"; done'
           sh 'git fetch --all'
           sh 'git pull --all'
         }

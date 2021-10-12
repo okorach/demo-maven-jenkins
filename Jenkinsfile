@@ -3,11 +3,7 @@ pipeline {
   stages {
     stage('git') {
       steps {
-        script {
-          sh 'git branch -r | grep -v -E ".>" | while read remote; do git branch --track "${remote#origin/}" "$remote"; done'
-          sh 'git fetch --all'
-          sh 'git pull --all'
-        }
+        checkout([$class: 'GitSCM', branches: [[name: '**']], extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false]], userRemoteConfigs: [[credentialsId: 'github-app', url: 'https://github.com/okorach/demo-maven-jenkins']]])
       }
     }
     stage('SonarQube LATEST analysis') {

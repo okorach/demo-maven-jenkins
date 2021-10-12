@@ -9,7 +9,7 @@ package coverage_metrics;
 public class CoverageMetrics {
 
   public float f(int i) {
-   int k = 0; /* default */
+   int k = 1; /* default */
    int j = 0;
    if (j != 0) {
       k = 1;

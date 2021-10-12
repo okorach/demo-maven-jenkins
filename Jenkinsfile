@@ -1,16 +1,3 @@
-buildDir = "build"
-pylintReport = "${buildDir}/pylint-report.out"
-banditReport = "${buildDir}/bandit-report.json"
-flake8Report = "${buildDir}/flake8-report.out"
-coverageReport = "${buildDir}/coverage.xml"
-
-coverageTool = 'coverage'
-pylintTool = 'pylint'
-flake8Tool = 'flake8'
-banditTool = 'bandit'
-
-// rm -rf -- ${buildDir:?"."}/* .coverage */__pycache__ */*.pyc # mediatools/__pycache__  testpytest/__pycache__ testunittest/__pycache__
-
 pipeline {
   agent any
   stages {

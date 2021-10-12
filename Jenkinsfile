@@ -14,6 +14,13 @@ banditTool = 'bandit'
 pipeline {
   agent any
   stages {
+    stage('git') {
+      steps {
+        script {
+          sh 'git fetch --all'
+        }
+      }
+    }
     stage('SonarQube LATEST analysis') {
       steps {
         withSonarQubeEnv('SQ Latest') {

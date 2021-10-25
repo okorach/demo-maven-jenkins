@@ -1,5 +1,12 @@
+projectKey = "demo:github-jenkins-maven"
+tags = "github,jenkins,maven"
+
 pipeline {
   agent any
+  environment {
+      SONAR_HOST_URL  = credentials('SONAR_HOST_URL')
+      SONAR_TOKEN     = credentials('SONAR_TOKEN')
+  }
   stages {
     stage('Code Checkout') {
       steps {
@@ -10,7 +17,11 @@ pipeline {
       steps {
         withSonarQubeEnv('SQ Latest') {
           script {
-            sh 'cd comp-maven; mvn sonar:sonar -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install org.jacoco:jacoco-maven-plugin:report sonar:sonar'
+            sh """
+              cd comp-maven
+              mvn sonar:sonar -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install org.jacoco:jacoco-maven-plugin:report sonar:sonar
+              curl -X POST -u $SONAR_TOKEN: \"$SONAR_HOST_URL/api/project_tags/set?project=${projectKey}&tags=${tags}\"
+            """
           }
         }
       }
@@ -23,7 +34,6 @@ pipeline {
             if (qg.status != 'OK') {
               echo "Maven component quality gate failed: ${qg.status}, proceeding anyway"
             }
-            sh 'rm -f comp-maven/target/sonar/report-task.txt'
           }
         }
       }

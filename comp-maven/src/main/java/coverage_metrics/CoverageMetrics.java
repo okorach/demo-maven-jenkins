@@ -9,9 +9,8 @@ package coverage_metrics;
 public class CoverageMetrics {
 
   public float f(int i) {
-   int k = 1; /* default */
-   int j = 0;
-   if (j != 0) {
+   int k = 0; /* default */
+   if (i != 0) {
       k = 1;
    }
    return (float)i/(k+1);

@@ -1,24 +1,27 @@
-buildDir = "build"
-pylintReport = "${buildDir}/pylint-report.out"
-banditReport = "${buildDir}/bandit-report.json"
-flake8Report = "${buildDir}/flake8-report.out"
-coverageReport = "${buildDir}/coverage.xml"
-
-coverageTool = 'coverage'
-pylintTool = 'pylint'
-flake8Tool = 'flake8'
-banditTool = 'bandit'
-
-// rm -rf -- ${buildDir:?"."}/* .coverage */__pycache__ */*.pyc # mediatools/__pycache__  testpytest/__pycache__ testunittest/__pycache__
+projectKey = "demo:github-jenkins-maven"
+tags = "github,jenkins,maven"
 
 pipeline {
   agent any
+  environment {
+      SONAR_HOST_URL  = credentials('SONAR_HOST_URL')
+      SONAR_TOKEN     = credentials('SONAR_TOKEN')
+  }
   stages {
+    stage('Code Checkout') {
+      steps {
+        checkout([$class: 'GitSCM', branches: [[name: '**']], extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false]], userRemoteConfigs: [[credentialsId: 'github-app', url: 'https://github.com/okorach/demo-maven-jenkins']]])
+      }
+    }
     stage('SonarQube LATEST analysis') {
       steps {
         withSonarQubeEnv('SQ Latest') {
           script {
-            sh 'cd comp-maven; mvn sonar:sonar -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install org.jacoco:jacoco-maven-plugin:report sonar:sonar'
+            sh """
+              cd comp-maven
+              mvn sonar:sonar -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install org.jacoco:jacoco-maven-plugin:report sonar:sonar
+              curl -X POST -u $SONAR_TOKEN: \"$SONAR_HOST_URL/api/project_tags/set?project=${projectKey}&tags=${tags}\"
+            """
           }
         }
       }
@@ -31,7 +34,6 @@ pipeline {
             if (qg.status != 'OK') {
               echo "Maven component quality gate failed: ${qg.status}, proceeding anyway"
             }
-            sh 'rm -f comp-maven/target/sonar/report-task.txt'
           }
         }
       }
